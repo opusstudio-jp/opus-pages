@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPUS — Momentum Proposal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Sans+JP:wght@300;400&display=swap');
+
+:root {
+  --bg:     #f4efe6;
+  --ink:    #1c1a17;
+  --warm:   #b8935a;
+  --muted:  #7a6e62;
+  --faint:  #e6dfd3;
+  --surf:   #ede8de;
+  --seed:   #2d4a3e;
+  --shape:  #1a2d4a;
+  --launch: #4a2d1a;
+  --impact: #3d1a4a;
+  --loop:   #1a3a4a;
+  --seed-a:   #6a9e8c;
+  --shape-a:  #6a8a9e;
+  --launch-a: #c8946a;
+  --impact-a: #9a7ab8;
+  --loop-a:   #6a9ab8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 300;
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 8vw 10vh;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--faint);
+}
+
+.hero-bg-word {
+  position: absolute;
+  right: -4vw;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(140px, 24vw, 340px);
+  font-weight: 300;
+  color: rgba(184,147,90,0.045);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.5em;
+  color: var(--warm);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: rise 0.9s 0.1s ease forwards;
+}
+
+.hero-title {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: clamp(32px, 5.5vw, 72px);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: rise 0.9s 0.25s ease forwards;
+}
+
+.hero-title em { font-style: normal; color: var(--warm); }
+
+.hero-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 2;
+  max-width: 480px;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: rise 0.9s 0.35s ease forwards;
+}
+
+/* 方程式 */
+.equation {
+  background: var(--ink);
+  padding: 36px 52px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: rise 0.9s 0.45s ease forwards;
+}
+
+.equation::after {
+  content: 'OPUS';
+  position: absolute;
+  right: -12px;
+  bottom: -28px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 140px;
+  font-weight: 300;
+  color: rgba(184,147,90,0.05);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.eq-label {
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--warm);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.eq-formula {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.8vw, 26px);
+  color: var(--bg);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.eq-formula .warm { color: var(--warm); }
+
+.eq-desc {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 12px;
+  color: rgba(244,239,230,0.55);
+  line-height: 2;
+  max-width: 560px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SECTION COMMON ── */
+.section {
+  padding: 80px 8vw;
+  border-bottom: 1px solid var(--faint);
+}
+
+.sec-label {
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--warm);
+  text-transform: uppercase;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sec-label::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--warm);
+}
+
+.sec-title {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: clamp(22px, 3.2vw, 38px);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  margin-bottom: 48px;
+}
+
+/* ── 要素定義テーブル ── */
+.elem-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+
+.elem-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 2fr;
+  gap: 2px;
+}
+
+.elem-cell {
+  padding: 20px 24px;
+  background: var(--surf);
+}
+
+.elem-cell.label-col {
+  background: var(--ink);
+}
+
+.elem-cell.head {
+  background: var(--ink);
+  padding: 12px 24px;
+}
+
+.elem-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: var(--warm);
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.elem-yomi {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: rgba(244,239,230,0.5);
+}
+
+.elem-def {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.elem-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.elem-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.dot-seed   { background: var(--seed-a); }
+.dot-shape  { background: var(--shape-a); }
+.dot-launch { background: var(--launch-a); }
+.dot-mom    { background: var(--warm); }
+.dot-impact { background: var(--impact-a); }
+.dot-loop   { background: var(--loop-a); }
+
+/* ── CASE STUDY TABLE ── */
+.case-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.case-table th {
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--warm);
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--faint);
+  background: var(--surf);
+}
+
+.case-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--faint);
+  color: var(--muted);
+  line-height: 1.7;
+  vertical-align: top;
+}
+
+.case-table tr:last-child td { border-bottom: none; }
+
+.case-table td:first-child {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.case-table tr.highlight td {
+  background: rgba(184,147,90,0.06);
+  color: var(--ink);
+}
+.case-table tr.highlight td:first-child {
+  color: var(--warm);
+}
+
+/* ── FRICTIO DESIGN ── */
+.design-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+
+.d-step {
+  background: var(--surf);
+  position: relative;
+}
+
+.d-step.s-seed   { border-left: 3px solid var(--seed-a); }
+.d-step.s-shape  { border-left: 3px solid var(--shape-a); }
+.d-step.s-launch { border-left: 3px solid var(--launch-a); }
+.d-step.s-mom    { border-left: 3px solid var(--warm); }
+.d-step.s-impact { border-left: 3px solid var(--impact-a); }
+
+.d-head {
+  padding: 20px 28px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--faint);
+}
+
+.d-phase {
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--warm);
+  text-transform: uppercase;
+}
+
+.d-body { padding: 20px 28px 24px; }
+
+.d-hl {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: clamp(14px, 1.5vw, 17px);
+  font-weight: 700;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.d-thesis {
+  background: var(--ink);
+  color: var(--warm);
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 13px;
+  padding: 14px 20px;
+  margin-bottom: 12px;
+  line-height: 1.8;
+}
+
+.d-text {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.d-list {
+  list-style: none;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.d-list li::before {
+  content: '— ';
+  color: var(--warm);
+}
+
+/* ── 6ヶ月モデル ── */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+  margin-bottom: 24px;
+}
+
+.t-month {
+  background: var(--surf);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.t-month-head {
+  background: var(--ink);
+  padding: 10px 14px;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--warm);
+  text-align: center;
+}
+
+.t-month-body {
+  padding: 14px 12px;
+}
+
+.t-phase-tag {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--warm);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.t-items {
+  list-style: none;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.t-items li::before { content: '· '; color: var(--warm); }
+
+.t-bar {
+  height: 3px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.bar-seed   { background: var(--seed-a); }
+.bar-shape  { background: var(--shape-a); }
+.bar-launch { background: var(--launch-a); }
+.bar-impact { background: var(--impact-a); }
+
+/* ── PHILOSOPHY ── */
+.opus-conditions {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  margin: 40px 0;
+}
+
+.cond-card {
+  background: var(--surf);
+  padding: 24px 20px;
+  border-top: 2px solid var(--faint);
+  position: relative;
+}
+
+.cond-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  font-weight: 300;
+  color: rgba(184,147,90,0.15);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.cond-title {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.cond-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.philosophy-quote {
+  background: var(--ink);
+  padding: 48px 52px;
+  margin: 40px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.philosophy-quote::after {
+  content: 'OPUS';
+  position: absolute;
+  right: -12px;
+  bottom: -28px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 140px;
+  font-weight: 300;
+  color: rgba(184,147,90,0.04);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.pq-text {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: clamp(14px, 1.8vw, 20px);
+  color: var(--bg);
+  line-height: 2;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.pq-sub {
+  font-size: 12px;
+  color: rgba(244,239,230,0.5);
+  line-height: 2;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── STUDIO / CLOSING ── */
+.studio {
+  padding: 80px 8vw;
+  border-bottom: 1px solid var(--faint);
+}
+
+.studio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.s-card {
+  background: var(--surf);
+  padding: 28px 30px;
+  border-top: 2px solid var(--faint);
+}
+
+.s-card-title {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+
+.s-card-body {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.closing {
+  padding: 100px 8vw;
+  text-align: center;
+}
+
+.closing-phrase {
+  font-family: 'Shippori Mincho B1', serif;
+  font-size: clamp(16px, 2vw, 22px);
+  line-height: 2;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.closing-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 2.2;
+  margin-bottom: 48px;
+}
+
+.closing-opus {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(60px, 12vw, 140px);
+  font-weight: 300;
+  color: rgba(28,26,23,0.08);
+  line-height: 1;
+}
+
+footer {
+  padding: 32px 8vw;
+  border-top: 1px solid var(--faint);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.f-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--ink);
+}
+
+.f-tag {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+}
+
+/* scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-word">OPUS</div>
+  <div class="hero-eyebrow">OPUS — Momentum Studio / Proposal</div>
+  <h1 class="hero-title">
+    モメンタムを、<br><em>設計する。</em>
+  </h1>
+  <p class="hero-sub">
+    意思決定のタイミングに火をつけ、作品にして、世に爆発させる。<br>
+    Seed × Shape × Launch を設計し、Impact と Loop を生む——<br>
+    それが OPUS の仕事です。
+  </p>
+  <div class="equation">
+    <div class="eq-label">The Equation</div>
+    <div class="eq-formula">
+      ( <span class="warm">Seed</span> × <span class="warm">Shape</span> × <span class="warm">Launch</span> )<sup style="font-size:0.6em">Momentum</sup>
+      　=　<span class="warm">Impact</span> &amp; <span class="warm">Loop</span>
+    </div>
+    <p class="eq-desc">
+      Seed（火種）× Shape（意匠）× Launch（花火）——この3つにSeed × Shape × Launch の3つを設計し、Momentum Score（熱量の定点指標）で管理することで、Impact（影響）が生まれ、次の花火へのLoop（循環）が始まる。
+    </p>
+  </div>
+</section>
+
+<!-- 要素定義 -->
+<section class="section reveal">
+  <div class="sec-label">Elements</div>
+  <h2 class="sec-title">方程式の読み方</h2>
+
+  <div class="elem-grid">
+    <!-- header -->
+    <div class="elem-row">
+      <div class="elem-cell head"><span style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;">要素</span></div>
+      <div class="elem-cell head"><span style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;">定義</span></div>
+      <div class="elem-cell head"><span style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;">役割：モメンタムへの寄与</span></div>
+    </div>
+    <!-- Seed -->
+    <div class="elem-row">
+      <div class="elem-cell label-col">
+        <span class="elem-dot dot-seed"></span>
+        <span class="elem-name">Seed</span>
+        <span class="elem-yomi">火種</span>
+      </div>
+      <div class="elem-cell"><span class="elem-def">変えたい意志</span></div>
+      <div class="elem-cell"><span class="elem-desc">ビジネスの目的を超えた「青い炎」。これがないとエンジンは掛からない。創業者・経営者の内なる意志を純化し、動かすべき重さを確定させる。</span></div>
+    </div>
+    <!-- Shape -->
+    <div class="elem-row">
+      <div class="elem-cell label-col">
+        <span class="elem-dot dot-shape"></span>
+        <span class="elem-name">Shape</span>
+        <span class="elem-yomi">意匠</span>
+      </div>
+      <div class="elem-cell"><span class="elem-def">具現化の意匠</span></div>
+      <div class="elem-cell"><span class="elem-desc">クリエイターによる仕事。資料・図解・映像・Web——火種を「形」にすることで確信と勢いが生まれる。Shapeがなければ、意志は意志のまま終わる。</span></div>
+    </div>
+    <!-- Launch -->
+    <div class="elem-row">
+      <div class="elem-cell label-col">
+        <span class="elem-dot dot-launch"></span>
+        <span class="elem-name">Launch</span>
+        <span class="elem-yomi">花火</span>
+      </div>
+      <div class="elem-cell"><span class="elem-def">放出のトリガー</span></div>
+      <div class="elem-cell"><span class="elem-desc">プレスリリース、イベント、登壇、PR。<strong>これを先に決めることが重要。</strong>期限が強制的に発生し、Seed・Shapeが動き出す。花火は結果ではなく全体を動かすトリガーである。</span></div>
+    </div>
+    <!-- Momentum -->
+    <div class="elem-row">
+      <div class="elem-cell label-col">
+        <span class="elem-dot dot-mom"></span>
+        <span class="elem-name">^Momentum</span>
+        <span class="elem-yomi">Momentum Score</span>
+      </div>
+      <div class="elem-cell"><span class="elem-def">脈拍の観測</span></div>
+      <div class="elem-cell"><span class="elem-desc">勢いが乗っているかを測る「べき乗」。プロセスでも結果でもなく、<strong>増幅率そのものを測る指標。</strong>会議の熱量、浸透率、SNSの反応速度など定点観測する。^Mが高いほど、ImpactとLoopは大きくなる。</span></div>
+    </div>
+    <!-- Impact -->
+    <div class="elem-row">
+      <div class="elem-cell label-col">
+        <span class="elem-dot dot-impact"></span>
+        <span class="elem-name">Impact</span>
+        <span class="elem-yomi">影響</span>
+      </div>
+      <div class="elem-cell"><span class="elem-def">可視化される結果</span></div>
+      <div class="elem-cell"><span class="elem-desc">採用応募の質・量の変化、問い合わせの増加、メディア掲載、投資家の信頼。数字だけでなく「この会社は本物だ」という市場の認識も含む。</span></div>
+    </div>
+    <!-- Loop -->
+    <div class="elem-row">
+      <div class="elem-cell label-col">
+        <span class="elem-dot dot-loop"></span>
+        <span class="elem-name">Loop</span>
+        <span class="elem-yomi">循環</span>
+      </div>
+      <div class="elem-cell"><span class="elem-def">次の花火へ</span></div>
+      <div class="elem-cell"><span class="elem-desc">一発の花火で終わらせない。ImpactがSeedに戻り、次のアンバサダー・次のイベント・次の資金調達が生まれる。<strong>Loopがある設計こそが、Momentum Studioの本質的な差別化。</strong></span></div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Frictio設計図 -->
+<section class="section reveal">
+  <div class="sec-label">Design Sample — Frictio</div>
+  <h2 class="sec-title">Frictio × OPUS<br>モメンタム設計図</h2>
+
+  <div class="design-grid">
+    <div class="d-step s-seed">
+      <div class="d-head">
+        <div class="elem-dot dot-seed"></div>
+        <div class="d-phase">Seed — 火種</div>
+      </div>
+      <div class="d-body">
+        <div class="d-hl">切り口の特定</div>
+        <div class="d-thesis">「営業から『作業』をなくす。AIネイティブ営業という新スタンダードの確立」</div>
+        <p class="d-text">従来のSFA/CRMは「管理のための入力」が目的化し、営業のクリエイティビティを奪っていた。Frictioは、入力をAIに丸投げし、人間を「商談と戦略」に回帰させる。</p>
+      </div>
+    </div>
+
+    <div class="d-step s-shape">
+      <div class="d-head">
+        <div class="elem-dot dot-shape"></div>
+        <div class="d-phase">Shape — 意匠</div>
+      </div>
+      <div class="d-body">
+        <div class="d-hl">ナラティブの具体化</div>
+        <ul class="d-list">
+          <li>「AIネイティブ営業の教科書」——従来の営業プロセスの非効率を解き、Frictio導入後の世界観を提示するホワイトペーパー。</li>
+          <li>導入事例（Opus）——機能紹介ではなく「営業マンの幸福度や商談の質がどう変わったか」に焦点を当てたドキュメンタリー記事。</li>
+          <li>日経新聞「働き方改革」「AI活用」文脈で最も鮮度の高いニュースに磨き上げる。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="d-step s-launch">
+      <div class="d-head">
+        <div class="elem-dot dot-launch"></div>
+        <div class="d-phase">Launch — 花火</div>
+      </div>
+      <div class="d-body">
+        <div class="d-hl">着火のトリガー</div>
+        <div class="d-thesis">「AI Native Sales Summit（仮）」の開催、または「AIネイティブ営業宣言」の大型リリース。</div>
+        <p class="d-text">SalesZine・ITmedia・Business Insider等の主要メディアに「営業職の定義が変わる瞬間」として独占インタビューや特集記事を仕掛ける。</p>
+      </div>
+    </div>
+
+    <div class="d-step s-mom">
+      <div class="d-head">
+        <div class="elem-dot dot-mom"></div>
+        <div class="d-phase">^Momentum — Momentum Score</div>
+      </div>
+      <div class="d-body">
+        <div class="d-hl">熱量の観測</div>
+        <p class="d-text">「まだCRMに入力してるの？」という空気が業界に生まれ、Frictioの思想に共鳴するコミュニティ（AIネイティブ営業の会）が活性化する。</p>
+        <ul class="d-list" style="margin-top:12px;">
+          <li>メディア掲載数・リーチの推移</li>
+          <li>コミュニティ参加者の熱量（Frictio浸透率）</li>
+          <li>問い合わせ数・質の変化</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="d-step s-impact">
+      <div class="d-head">
+        <div class="elem-dot dot-impact"></div>
+        <div class="d-phase">Impact &amp; Loop</div>
+      </div>
+      <div class="d-body">
+        <div class="d-hl">影響と循環</div>
+        <ul class="d-list">
+          <li><strong>Impact:</strong> 日本の営業生産性が可視化され、Frictioが「営業組織の必須OS」として認知される。</li>
+          <li><strong>Loop:</strong> 「次はカスタマーサクセスから作業をなくす」といった隣接領域への拡張——次の花火へ繋げる。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6ヶ月モデル -->
+<section class="section reveal">
+  <div class="sec-label">Standard Model</div>
+  <h2 class="sec-title">OPUS — 標準6ヶ月モデル</h2>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:40px;letter-spacing:0.05em;">全案件共通の進行テンプレート</p>
+
+  <div style="display:flex;gap:24px;margin-bottom:24px;flex-wrap:wrap;">
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(106,158,140,0.3);border:1px solid var(--seed-a);"></span>🔥 Seed</span>
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(106,138,158,0.3);border:1px solid var(--shape-a);"></span>🎨 Shape</span>
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(200,148,106,0.3);border:1px solid var(--launch-a);"></span>🎆 Launch</span>
+    <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(184,147,90,0.15);border:1px solid var(--warm);"></span>⚡ Momentum Score</span>
+  </div>
+
+  <div style="background:var(--ink);border-radius:2px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:120px repeat(6,1fr);border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="padding:12px 16px;"></div>
+      <div style="padding:12px 8px;text-align:center;font-size:10px;letter-spacing:0.3em;color:var(--warm);">M1</div>
+      <div style="padding:12px 8px;text-align:center;font-size:10px;letter-spacing:0.3em;color:var(--warm);">M2</div>
+      <div style="padding:12px 8px;text-align:center;font-size:10px;letter-spacing:0.3em;color:var(--warm);">M3</div>
+      <div style="padding:12px 8px;text-align:center;font-size:10px;letter-spacing:0.3em;color:var(--warm);">M4</div>
+      <div style="padding:12px 8px;text-align:center;font-size:10px;letter-spacing:0.3em;color:var(--warm);">M5</div>
+      <div style="padding:12px 8px;text-align:center;font-size:10px;letter-spacing:0.3em;color:var(--warm);">M6</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px repeat(6,1fr);border-bottom:1px solid rgba(255,255,255,0.06);align-items:center;">
+      <div style="padding:16px;font-size:12px;color:rgba(244,239,230,0.7);">🔥 Seed</div>
+      <div style="padding:8px 6px;"><div style="background:rgba(106,158,140,0.25);border:1px solid var(--seed-a);border-radius:3px;padding:7px 10px;font-size:11px;color:var(--seed-a);">切り口確定</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(106,158,140,0.25);border:1px solid var(--seed-a);border-radius:3px;padding:7px 10px;font-size:11px;color:var(--seed-a);">ナラティブ磨き</div></div>
+      <div style="padding:8px 6px;"></div><div style="padding:8px 6px;"></div><div style="padding:8px 6px;"></div><div style="padding:8px 6px;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px repeat(6,1fr);border-bottom:1px solid rgba(255,255,255,0.06);align-items:center;">
+      <div style="padding:16px;font-size:12px;color:rgba(244,239,230,0.7);">🎨 Shape</div>
+      <div style="padding:8px 6px;"></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(106,138,158,0.25);border:1px solid var(--shape-a);border-radius:3px;padding:7px 10px;font-size:11px;color:var(--shape-a);">設計開始</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(106,138,158,0.25);border:1px solid var(--shape-a);border-radius:3px;padding:7px 10px;font-size:11px;color:var(--shape-a);">マテリアル制作</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(106,138,158,0.18);border:1px solid rgba(106,138,158,0.5);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(106,138,158,0.7);">LP・記事完成</div></div>
+      <div style="padding:8px 6px;"></div><div style="padding:8px 6px;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px repeat(6,1fr);border-bottom:1px solid rgba(255,255,255,0.06);align-items:center;">
+      <div style="padding:16px;font-size:12px;color:rgba(244,239,230,0.7);">🎆 Launch</div>
+      <div style="padding:8px 6px;"></div><div style="padding:8px 6px;"></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(200,148,106,0.18);border:1px solid rgba(200,148,106,0.5);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(200,148,106,0.7);">リリース準備</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(200,148,106,0.35);border:1px solid var(--launch-a);border-radius:3px;padding:7px 10px;font-size:11px;color:var(--launch-a);font-weight:500;">🎆 花火</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(200,148,106,0.25);border:1px solid var(--launch-a);border-radius:3px;padding:7px 10px;font-size:11px;color:var(--launch-a);">二次展開</div></div>
+      <div style="padding:8px 6px;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px repeat(6,1fr);border-bottom:1px solid rgba(255,255,255,0.06);align-items:center;">
+      <div style="padding:16px;font-size:12px;color:rgba(244,239,230,0.7);">⚡ Momentum Score</div>
+      <div style="padding:8px 6px;"><div style="background:rgba(184,147,90,0.12);border:1px solid rgba(184,147,90,0.3);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(184,147,90,0.8);">Score設定</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(184,147,90,0.12);border:1px solid rgba(184,147,90,0.3);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(184,147,90,0.8);">計測開始</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(184,147,90,0.12);border:1px solid rgba(184,147,90,0.3);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(184,147,90,0.8);">中間確認</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(184,147,90,0.12);border:1px solid rgba(184,147,90,0.3);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(184,147,90,0.8);">調整</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(184,147,90,0.12);border:1px solid rgba(184,147,90,0.3);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(184,147,90,0.8);">加速</div></div>
+      <div style="padding:8px 6px;"><div style="background:rgba(184,147,90,0.12);border:1px solid rgba(184,147,90,0.3);border-radius:3px;padding:7px 10px;font-size:11px;color:rgba(184,147,90,0.8);">振り返り・次弾</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px repeat(6,1fr);border-bottom:1px solid rgba(255,255,255,0.06);align-items:center;">
+      <div style="padding:12px 16px;"><div style="font-size:10px;color:rgba(244,239,230,0.4);line-height:1.6;">週1 MTG<br>Jay × 顧客</div></div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">毎週</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">毎週</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">毎週</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">毎週</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">毎週</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">毎週</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px repeat(6,1fr);align-items:center;">
+      <div style="padding:12px 16px;"><div style="font-size:10px;color:rgba(244,239,230,0.4);line-height:1.6;">大金さん<br>参加MTG</div></div>
+      <div style="padding:8px 6px;"></div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">月1</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">月1〜2</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">月2</div>
+      <div style="padding:8px 6px;text-align:center;font-size:11px;color:rgba(244,239,230,0.3);">Launch週毎週</div>
+      <div style="padding:8px 6px;"></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;">
+    <div style="background:var(--surf);padding:24px 26px;">
+      <div style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;margin-bottom:14px;">週1MTGでやること</div>
+      <ul style="list-style:none;font-size:12px;color:var(--muted);line-height:2.2;"><li>進捗確認</li><li>今週のアクション確定</li><li>モメンタムの温度確認</li></ul>
+    </div>
+    <div style="background:var(--surf);padding:24px 26px;">
+      <div style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;margin-bottom:14px;">Jayが担う領域</div>
+      <ul style="list-style:none;font-size:12px;color:var(--muted);line-height:2.2;"><li>切り口設計</li><li>全体ディレクション</li><li>マテリアル骨子</li></ul>
+    </div>
+    <div style="background:var(--surf);padding:24px 26px;">
+      <div style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;margin-bottom:14px;">大金さんが担う領域</div>
+      <ul style="list-style:none;font-size:12px;color:var(--muted);line-height:2.2;"><li>ナラティブ磨き</li><li>媒体・記者アプローチ</li><li>Launch設計</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- OPUSが存在する理由 -->
+<!-- モメンタム部署 -->
+<section class="section reveal">
+  <div class="sec-label">Organization Design</div>
+  <h2 class="sec-title">あなたの組織に<br><em>モメンタムチームを。</em></h2>
+
+  <!-- モメンタムチームの仕事 -->
+  <div style="margin-bottom:48px;">
+    <div style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;margin-bottom:32px;display:flex;align-items:center;gap:14px;"><span style="display:block;width:20px;height:1px;background:var(--warm);"></span>What Momentum Team Does</div>
+
+    <!-- 3つの仕事 -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:2px;">
+      <div style="background:var(--surf);padding:28px 26px;border-top:3px solid var(--seed-a);">
+        <div style="font-size:9px;letter-spacing:0.3em;color:var(--seed-a);text-transform:uppercase;margin-bottom:12px;">01 — Seed</div>
+        <div style="font-family:'Shippori Mincho B1',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.5;">火種を見つける</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;">「次に何で山を作るか」を決める。資金調達、採用、新製品——どのタイミングで、何を世に出すか。<strong style="color:var(--ink);">これがないと何も始まらない。</strong></p>
+      </div>
+      <div style="background:var(--surf);padding:28px 26px;border-top:3px solid var(--shape-a);">
+        <div style="font-size:9px;letter-spacing:0.3em;color:var(--shape-a);text-transform:uppercase;margin-bottom:12px;">02 — Shape</div>
+        <div style="font-family:'Shippori Mincho B1',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.5;">意匠に変える</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;">火種を、人に伝わる形にする。記事、動画、イベント、LP——意志を「作品の素材」に変換する仕事。</p>
+      </div>
+      <div style="background:var(--surf);padding:28px 26px;border-top:3px solid var(--launch-a);">
+        <div style="font-size:9px;letter-spacing:0.3em;color:var(--launch-a);text-transform:uppercase;margin-bottom:12px;">03 — Launch</div>
+        <div style="font-family:'Shippori Mincho B1',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.5;">花火を打ち上げる</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;">タイミングを設計して、一気に世に放つ。プレスリリース、登壇、PR——<strong style="color:var(--ink);">花火の日程を先に決めることで、Seed・Shapeが動き出す。</strong></p>
+      </div>
+    </div>
+
+    <!-- Momentum Score -->
+    <div style="background:var(--ink);padding:24px 28px;margin-bottom:2px;display:grid;grid-template-columns:1fr 2fr;gap:24px;align-items:center;">
+      <div>
+        <div style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;margin-bottom:10px;">Momentum Score</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,26px);color:var(--bg);letter-spacing:0.04em;">熱量の定点指標</div>
+      </div>
+      <p style="font-size:12px;color:rgba(244,239,230,0.6);line-height:2;">この3つを管理するのがMomentum Score。熱量が落ちていないか、勢いが乗っているかを定点観測する。これがモメンタムチームの「脈拍管理」。<strong style="color:var(--warm);">スコアが高いほど、ImpactとLoopは大きくなる。</strong></p>
+    </div>
+
+    <!-- Impact & Loop -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:2px;">
+      <div style="background:var(--surf);padding:24px 26px;border-top:3px solid var(--impact-a);">
+        <div style="font-size:9px;letter-spacing:0.3em;color:var(--impact-a);text-transform:uppercase;margin-bottom:10px;">Impact</div>
+        <div style="font-family:'Shippori Mincho B1',serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;">可視化される影響</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;">数字、認知、信頼。「この会社は本物だ」という市場の認識として積み上がる。</p>
+      </div>
+      <div style="background:var(--surf);padding:24px 26px;border-top:3px solid var(--loop-a);">
+        <div style="font-size:9px;letter-spacing:0.3em;color:var(--loop-a);text-transform:uppercase;margin-bottom:10px;">Loop → Opus</div>
+        <div style="font-family:'Shippori Mincho B1',serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;">次の花火が自然に生まれる状態</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;">一発で終わらず、構造として回り続ける。みんなが語り、人を巻き込む——それが<strong style="color:var(--ink);">作品（Opus）</strong>になる。</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 図：組織構造 -->
+  <div style="margin-bottom:48px;">
+
+    <!-- 通常の組織（分断） -->
+    <div style="margin-bottom:4px;">
+      <div style="font-size:9px;letter-spacing:0.4em;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+        <span style="display:block;width:16px;height:1px;background:var(--muted);opacity:0.4;"></span>
+        通常の組織：部署間でモメンタムが漏れる
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:2px;">
+        <div style="background:var(--surf);padding:20px 24px;border-top:2px solid var(--faint);">
+          <div style="font-size:9px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">営業 / Sales</div>
+          <div style="font-size:12px;color:var(--ink);font-family:'Shippori Mincho B1',serif;font-weight:700;margin-bottom:8px;">顧客獲得に最適化</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8;">作業（Work）に特化。熱量の文脈が伝わらない。</div>
+        </div>
+        <div style="background:var(--surf);padding:20px 24px;border-top:2px solid var(--faint);">
+          <div style="font-size:9px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">マーケ / Marketing</div>
+          <div style="font-size:12px;color:var(--ink);font-family:'Shippori Mincho B1',serif;font-weight:700;margin-bottom:8px;">認知獲得に最適化</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8;">施策単位で動く。物語がバラバラに消費される。</div>
+        </div>
+        <div style="background:var(--surf);padding:20px 24px;border-top:2px solid var(--faint);">
+          <div style="font-size:9px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">PR</div>
+          <div style="font-size:12px;color:var(--ink);font-family:'Shippori Mincho B1',serif;font-weight:700;margin-bottom:8px;">掲載獲得に最適化</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8;">出口だけを担う。火種の文脈が届いていない。</div>
+        </div>
+      </div>
+      <!-- 漏れを示す矢印 -->
+      <div style="background:rgba(122,110,98,0.08);border:1px dashed rgba(122,110,98,0.3);padding:12px 20px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:18px;opacity:0.4;">↓</span>
+        <span style="font-size:11px;color:var(--muted);line-height:1.8;"><strong style="color:var(--ink);">部署間の隙間でモメンタムが死ぬ。</strong>　誰もSeedからLoopまでを一気通貫で設計・管理しない。</span>
+      </div>
+    </div>
+
+    <!-- 矢印 -->
+    <div style="text-align:center;padding:20px 0;font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--warm);opacity:0.6;">↓</div>
+
+    <!-- OPUSあり（外部モメンタム部署） -->
+    <div>
+      <div style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+        <span style="display:block;width:16px;height:1px;background:var(--warm);"></span>
+        OPUSあり：外部モメンタム部署として全社横断
+      </div>
+
+      <!-- 外部OPUSブロック -->
+      <div style="background:var(--ink);padding:24px 28px;margin-bottom:2px;position:relative;overflow:hidden;">
+        <div style="position:absolute;right:-10px;bottom:-20px;font-family:'Cormorant Garamond',serif;font-size:100px;font-weight:300;color:rgba(184,147,90,0.05);line-height:1;pointer-events:none;">OPUS</div>
+        <div style="font-size:9px;letter-spacing:0.4em;color:var(--warm);text-transform:uppercase;margin-bottom:14px;">OPUS — External Momentum Dept.</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;z-index:1;">
+          <div>
+            <div style="font-size:10px;letter-spacing:0.2em;color:var(--seed-a);text-transform:uppercase;margin-bottom:6px;">Seed 設計</div>
+            <div style="font-size:11px;color:rgba(244,239,230,0.6);line-height:1.8;">火種の特定・Thesis構築。全社の意志を一点に絞り込む。</div>
+          </div>
+          <div>
+            <div style="font-size:10px;letter-spacing:0.2em;color:var(--shape-a);text-transform:uppercase;margin-bottom:6px;">Shape + Launch 実行</div>
+            <div style="font-size:11px;color:rgba(244,239,230,0.6);line-height:1.8;">作品化・花火設計・PR展開。意志を世界へ放出する。</div>
+          </div>
+          <div>
+            <div style="font-size:10px;letter-spacing:0.2em;color:var(--warm);text-transform:uppercase;margin-bottom:6px;">Momentum Score 管理</div>
+            <div style="font-size:11px;color:rgba(244,239,230,0.6);line-height:1.8;">熱量の定点観測・次の花火の設計。Loopを途絶えさせない。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 接続線：各部署との連携 -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+        <div style="background:var(--surf);padding:16px 20px;border-top:2px solid var(--seed-a);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;opacity:0.5;">↕</span>
+          <div>
+            <div style="font-size:9px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">営業 / Sales</div>
+            <div style="font-size:11px;color:var(--muted);">Seedの文脈を営業トークに落とし込む</div>
+          </div>
+        </div>
+        <div style="background:var(--surf);padding:16px 20px;border-top:2px solid var(--shape-a);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;opacity:0.5;">↕</span>
+          <div>
+            <div style="font-size:9px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">マーケ / Marketing</div>
+            <div style="font-size:11px;color:var(--muted);">Shapeの素材をマーケ施策に統合する</div>
+          </div>
+        </div>
+        <div style="background:var(--surf);padding:16px 20px;border-top:2px solid var(--launch-a);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;opacity:0.5;">↕</span>
+          <div>
+            <div style="font-size:9px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">PR</div>
+            <div style="font-size:11px;color:var(--muted);">Launchの花火設計をPRチームと実行する</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3つの役割 -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+    <div style="background:var(--surf);padding:28px 26px;border-top:2px solid var(--seed-a);">
+      <div style="font-size:32px;font-family:'Cormorant Garamond',serif;font-weight:300;color:rgba(106,158,140,0.3);margin-bottom:10px;">01</div>
+      <div style="font-family:'Shippori Mincho B1',serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5;">構造的欠陥の解消</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.9;">営業・マーケ・PRが分断され、それぞれが「作業（Work）」に最適化されている。その部署間の隙間で、本来生まれるはずの熱量が漏れ出している。OPUSはその隙間を埋める。</p>
+    </div>
+    <div style="background:var(--surf);padding:28px 26px;border-top:2px solid var(--warm);">
+      <div style="font-size:32px;font-family:'Cormorant Garamond',serif;font-weight:300;color:rgba(184,147,90,0.2);margin-bottom:10px;">02</div>
+      <div style="font-family:'Shippori Mincho B1',serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5;">OPUSの役割</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.9;">外部にありながら<strong style="color:var(--ink);">「全社横断のモメンタム部署」</strong>として機能する。定期的な山（Launch）を意図的に設計し、^Momentumを定点観測し、熱量が冷める前に次のSeedを特定する。</p>
+    </div>
+    <div style="background:var(--surf);padding:28px 26px;border-top:2px solid var(--impact-a);">
+      <div style="font-size:32px;font-family:'Cormorant Garamond',serif;font-weight:300;color:rgba(154,122,184,0.2);margin-bottom:10px;">03</div>
+      <div style="font-family:'Shippori Mincho B1',serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5;">モメンタムが作品になる</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.9;">なぜ「OPUS」という名前なのか——正しく設計・管理されたモメンタムの先に、単なる実績を超えた<strong style="color:var(--ink);">語り継がれる「作品（Opus）」</strong>が結晶するから。</p>
+    </div>
+  </div>
+</section>
+
+<section class="studio reveal">
+  <div class="sec-label">Why OPUS</div>
+  <h2 class="sec-title" style="margin-bottom:24px;">分業の壁を壊す</h2>
+  <p style="font-size:13px;color:var(--muted);line-height:2;max-width:640px;margin-bottom:48px;">通常の組織では、Seed・Shape・Launchがそれぞれ分断されている。コンサルはSeedで止まり、制作会社はShapeで止まり、PR会社はLaunchで止まる。<strong style="color:var(--ink);">その分断の隙間で、モメンタムは死ぬ。</strong></p>
+
+  <div class="studio-grid">
+    <div class="s-card">
+      <div class="s-card-title">意志の運び手</div>
+      <p class="s-card-body">OPUSはSeedからLoopまでを一貫して設計・実行する。「納品で終わり」ではなく、Impactが出るまでを責任範囲に置く。</p>
+    </div>
+    <div class="s-card">
+      <div class="s-card-title">花火を先に決める</div>
+      <p class="s-card-body">Launch（花火）の日程を最初に設定する。期限が強制的に発生し、Seed・Shapeが自然と動き出す。これがモメンタムの起動装置。</p>
+    </div>
+    <div class="s-card">
+      <div class="s-card-title">^Momentumを測り続ける</div>
+      <p class="s-card-body">勢いが乗っているかを定点観測する。会議の熱量、浸透率、反応速度。数字と感覚の両方でモメンタムを設計する。</p>
+    </div>
+    <div class="s-card">
+      <div class="s-card-title">Loopをつくる設計</div>
+      <p class="s-card-body">一発の花火で終わらせない。ImpactがSeedに戻り、次の花火が生まれる構造を最初から組み込む。それが作品（Opus）になる条件。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Philosophy -->
+<section class="section reveal">
+  <div class="sec-label">Philosophy</div>
+  <h2 class="sec-title">作品（OPUS）の定義</h2>
+  <p style="font-size:13px;color:var(--muted);line-height:2;max-width:560px;margin-bottom:0;">正しく設計されたモメンタムの先には、単なる実績ではない<strong style="color:var(--ink);">「作品（Opus）」</strong>が結晶する。私たちが「作品」と呼ぶものには、5つの条件がある。</p>
+
+  <div class="opus-conditions">
+    <div class="cond-card">
+      <div class="cond-num">01</div>
+      <div class="cond-title">語り継げる</div>
+      <p class="cond-desc">10年経っても鮮明に再生でき、語るたびに熱量が蘇る。</p>
+    </div>
+    <div class="cond-card">
+      <div class="cond-num">02</div>
+      <div class="cond-title">他者に伝播する</div>
+      <p class="cond-desc">創り手の元を離れ、誰かがその物語を語り始める。</p>
+    </div>
+    <div class="cond-card">
+      <div class="cond-num">03</div>
+      <div class="cond-title">数字を超えた<br>文脈を持つ</div>
+      <p class="cond-desc">結果の背後に「全員が主演だった」という物語が宿る。</p>
+    </div>
+    <div class="cond-card">
+      <div class="cond-num">04</div>
+      <div class="cond-title">時間とともに<br>意味が増す</div>
+      <p class="cond-desc">建築物のように、振り返るほどに価値が深まる。</p>
+    </div>
+    <div class="cond-card">
+      <div class="cond-num">05</div>
+      <div class="cond-title">次の挑戦を<br>呼び込む（磁力）</div>
+      <p class="cond-desc">その仕事が、まだ名前のない次なるプロジェクトを引き寄せる。</p>
+    </div>
+  </div>
+
+  <div class="philosophy-quote">
+    <p class="pq-text">「いい作品（Opus）を出し続けた人だけが、<br>次の、まだ名前のないプロジェクトに呼ばれる。」</p>
+    <p class="pq-sub">モメンタムを設計し、実行する。その結果が「作品」となり、また次の物語へと繋がっていく。<br>私たちは、この循環を世界に増やしていく。</p>
+  </div>
+</section>
+
+<!-- Closing -->
+<section class="closing reveal">
+  <p class="closing-phrase">
+    仕事は、作品になる。
+  </p>
+  <p class="closing-sub">
+    Your Work as Opus
+  </p>
+  <div class="closing-opus">OPUS</div>
+</section>
+
+<footer>
+  <div class="f-logo">OPUS</div>
+  <div class="f-tag">Momentum Studio — Tokyo, Japan</div>
+</footer>
+
+<script>
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.06 });
+revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
